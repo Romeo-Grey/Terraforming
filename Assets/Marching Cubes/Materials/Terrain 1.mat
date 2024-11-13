@@ -2,20 +2,24 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Terrain 1
   m_Shader: {fileID: 4800000, guid: 2d2c0623af9d6944184aa824ad53be66, type: 3}
-  m_ShaderKeywords: 
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -59,13 +63,14 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _BumpScale: 1
     - _Cutoff: 0.5
     - _DetailNormalMapScale: 1
     - _DstBlend: 0
     - _GlossMapScale: 1
-    - _Glossiness: 0
+    - _Glossiness: 0.1
     - _GlossyReflections: 1
     - _Metallic: 0
     - _Mode: 0
@@ -78,12 +83,13 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.8679245, g: 0.47080812, b: 0.47080812, a: 1}
+    - _Color: {r: 0.19622642, g: 0.038504805, b: 0.038504805, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GrassDark: {r: 0.13900483, g: 0.4245283, b: 0, a: 1}
-    - _GrassLight: {r: 0.58606106, g: 0.6886792, b: 0, a: 1}
-    - _RockDark: {r: 0.24528301, g: 0.13069123, b: 0.09140263, a: 1}
+    - _GrassDark: {r: 0.044542518, g: 0.047604114, b: 0.08679241, a: 1}
+    - _GrassLight: {r: 0.009630021, g: 0.17358482, b: 0.004585262, a: 1}
+    - _RockDark: {r: 0.16981131, g: 0, b: 0.020024946, a: 1}
     - _RockInnerDeep: {r: 0.36862746, g: 0, b: 0.34267107, a: 1}
-    - _RockInnerShallow: {r: 0.3962264, g: 0.26017246, b: 0.15512636, a: 1}
-    - _RockLight: {r: 0.5943396, g: 0.36826882, b: 0.19344072, a: 1}
+    - _RockInnerShallow: {r: 0.2113207, g: 0.1297695, b: 0.07017441, a: 1}
+    - _RockLight: {r: 0.3056603, g: 0.16432014, b: 0.056518335, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1

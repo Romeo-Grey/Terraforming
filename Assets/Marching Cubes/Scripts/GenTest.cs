@@ -9,7 +9,6 @@ public class GenTest : MonoBehaviour
 
 	[Header("Init Settings")]
 	public int numChunks = 4;
-
 	public int numPointsPerAxis = 10;
 	public float boundsSize = 10;
 	public float isoLevel = 0f;
@@ -26,6 +25,12 @@ public class GenTest : MonoBehaviour
 	public ComputeShader blurCompute;
 	public ComputeShader editCompute;
 	public Material material;
+
+	[Header("Chunk Rendering")]
+	public float renderDistance = 100f;
+	public Transform player;
+	private Dictionary<Chunk, bool> chunkRenderStates = new Dictionary<Chunk, bool>();
+	
 
 
 	// Private
@@ -50,6 +55,11 @@ public class GenTest : MonoBehaviour
 		CreateBuffers();
 
 		CreateChunks();
+		
+		if (player == null)
+		{
+			player = Camera.main.transform;
+		}
 
 		var sw = System.Diagnostics.Stopwatch.StartNew();
 		GenerateAllChunks();
@@ -182,19 +192,11 @@ public class GenTest : MonoBehaviour
 
 	void Update()
 	{
-
-		// TODO: move somewhere more sensible
 		material.SetTexture("DensityTex", originalMap);
 		material.SetFloat("oceanRadius", FindObjectOfType<Water>().radius);
 		material.SetFloat("planetBoundsSize", boundsSize);
-
-		/*
-		if (Input.GetKeyDown(KeyCode.G))
-		{
-			Debug.Log("Generate");
-			GenerateAllChunks();
-		}
-		*/
+		
+		UpdateChunkVisibility();
 	}
 
 
@@ -338,6 +340,32 @@ public class GenTest : MonoBehaviour
 		texture.name = name;
 	}
 
-
-
+	void UpdateChunkVisibility()
+	{
+		if (player == null) return;
+		
+		foreach (Chunk chunk in chunks)
+		{
+			float distance = Vector3.Distance(player.position, chunk.centre);
+			bool shouldBeVisible = distance <= renderDistance;
+			
+			// Only update if state changed
+			if (!chunkRenderStates.ContainsKey(chunk) || chunkRenderStates[chunk] != shouldBeVisible)
+			{
+				chunk.filter.SetActive(shouldBeVisible);
+				chunkRenderStates[chunk] = shouldBeVisible;
+			}
+		}
+	}
 }
+
+public static class MeshFilterExtensions 
+{
+    public static void SetActive(this MeshFilter filter, bool active)
+    {
+        filter.gameObject.SetActive(active);
+    }
+}
+
+
+
