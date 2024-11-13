@@ -6,6 +6,9 @@ using UnityEngine.Rendering;
 
 public class GenTest : MonoBehaviour
 {
+	[Header("Chunk Loading")]
+	public float loadDistance = 32f;
+	private ChunkLoader chunkLoader;
 
 	[Header("Init Settings")]
 	public int numChunks = 4;
@@ -48,28 +51,39 @@ public class GenTest : MonoBehaviour
 	System.Diagnostics.Stopwatch timer_fetchVertexData;
 	System.Diagnostics.Stopwatch timer_processVertexData;
 	RenderTexture originalMap;
-
 	void Start()
 	{
 		InitTextures();
 		CreateBuffers();
+		
+		// Initialize timers
+		timer_fetchVertexData = new System.Diagnostics.Stopwatch();
+		timer_processVertexData = new System.Diagnostics.Stopwatch();
+		
+		// Initialize compute buffers before any chunk generation
+		int numPoints = numPointsPerAxis * numPointsPerAxis * numPointsPerAxis;
+		int numVoxelsPerAxis = numPointsPerAxis - 1;
+		int numVoxels = numVoxelsPerAxis * numVoxelsPerAxis * numVoxelsPerAxis;
+		int maxTriangleCount = numVoxels * 5;
+		int maxVertexCount = maxTriangleCount * 3;
 
-		CreateChunks();
+		triCountBuffer = new ComputeBuffer(1, sizeof(int), ComputeBufferType.Raw);
+		triangleBuffer = new ComputeBuffer(maxVertexCount, ComputeHelper.GetStride<VertexData>(), ComputeBufferType.Append);
+		vertexDataArray = new VertexData[maxVertexCount];
+		
+		chunkLoader = gameObject.AddComponent<ChunkLoader>();
+		chunkLoader.genTest = this;
 		
 		if (player == null)
 		{
 			player = Camera.main.transform;
 		}
-
-		var sw = System.Diagnostics.Stopwatch.StartNew();
-		GenerateAllChunks();
-		Debug.Log("Generation Time: " + sw.ElapsedMilliseconds + " ms");
-
+		
+		ComputeDensity();
+		
 		ComputeHelper.CreateRenderTexture3D(ref originalMap, processedDensityTexture);
 		ComputeHelper.CopyRenderTexture3D(processedDensityTexture, originalMap);
-
 	}
-
 	void InitTextures()
 	{
 
@@ -100,7 +114,6 @@ public class GenTest : MonoBehaviour
 		// Create timers:
 		timer_fetchVertexData = new System.Diagnostics.Stopwatch();
 		timer_processVertexData = new System.Diagnostics.Stopwatch();
-
 		totalVerts = 0;
 		ComputeDensity();
 
@@ -147,7 +160,7 @@ public class GenTest : MonoBehaviour
 		}
 	}
 
-	void GenerateChunk(Chunk chunk)
+	public void GenerateChunk(Chunk chunk)
 	{
 
 
@@ -173,7 +186,7 @@ public class GenTest : MonoBehaviour
 		triCountBuffer.SetData(vertexCountData);
 		ComputeBuffer.CopyCount(triangleBuffer, triCountBuffer, 0);
 
-		timer_fetchVertexData.Start();
+		//timer_fetchVertexData.Start();
 		triCountBuffer.GetData(vertexCountData);
 
 		int numVertices = vertexCountData[0] * 3;
@@ -182,7 +195,7 @@ public class GenTest : MonoBehaviour
 
 		triangleBuffer.GetData(vertexDataArray, 0, 0, numVertices);
 
-		timer_fetchVertexData.Stop();
+		//timer_fetchVertexData.Stop();
 
 		//CreateMesh(vertices);
 		timer_processVertexData.Start();
@@ -195,11 +208,18 @@ public class GenTest : MonoBehaviour
 		material.SetTexture("DensityTex", originalMap);
 		material.SetFloat("oceanRadius", FindObjectOfType<Water>().radius);
 		material.SetFloat("planetBoundsSize", boundsSize);
-		
+
 		UpdateChunkVisibility();
 	}
 
-
+	private Vector3 GetChunkCenterPosition(Vector3Int chunkCoord) {
+		float chunkSize = boundsSize / numChunks;
+		return new Vector3(
+			(chunkCoord.x + 0.5f) * chunkSize,
+			(chunkCoord.y + 0.5f) * chunkSize,
+			(chunkCoord.z + 0.5f) * chunkSize
+		);
+	}
 
 	void CreateBuffers()
 	{
@@ -343,20 +363,29 @@ public class GenTest : MonoBehaviour
 	void UpdateChunkVisibility()
 	{
 		if (player == null) return;
-		
-		foreach (Chunk chunk in chunks)
+	
+		Vector3 playerPos = player.position;
+		int chunkX = Mathf.FloorToInt(playerPos.x / (boundsSize / numChunks));
+		int chunkY = Mathf.FloorToInt(playerPos.y / (boundsSize / numChunks));
+		int chunkZ = Mathf.FloorToInt(playerPos.z / (boundsSize / numChunks));
+	
+		int loadRadius = Mathf.CeilToInt(loadDistance / (boundsSize / numChunks));
+	
+		for (int x = -loadRadius; x <= loadRadius; x++) 
 		{
-			float distance = Vector3.Distance(player.position, chunk.centre);
-			bool shouldBeVisible = distance <= renderDistance;
-			
-			// Only update if state changed
-			if (!chunkRenderStates.ContainsKey(chunk) || chunkRenderStates[chunk] != shouldBeVisible)
+			for (int y = -loadRadius; y <= loadRadius; y++) 
 			{
-				chunk.filter.SetActive(shouldBeVisible);
-				chunkRenderStates[chunk] = shouldBeVisible;
+				for (int z = -loadRadius; z <= loadRadius; z++)
+				{
+					Vector3Int chunkCoord = new Vector3Int(chunkX + x, chunkY + y, chunkZ + z);
+					if (Vector3.Distance(playerPos, GetChunkCenterPosition(chunkCoord)) <= loadDistance) 
+					{
+						chunkLoader.QueueChunkLoad(chunkCoord);
+					}
+				}
 			}
 		}
-	}
+	}	
 }
 
 public static class MeshFilterExtensions 
@@ -366,6 +395,3 @@ public static class MeshFilterExtensions
         filter.gameObject.SetActive(active);
     }
 }
-
-
-

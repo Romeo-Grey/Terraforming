@@ -172,6 +172,7 @@ public class EffectManager : MonoBehaviour
 		ComputeHelper.Release(waterDepthTex, blurredTexture);
 	}
 
+	
 	public static Vector3 DirToSun {
 		get {
 			return -sunTransform.forward;

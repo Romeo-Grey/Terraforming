@@ -329,6 +329,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c97c9cb73740fe64d91491c03c60b152, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  loadDistance: 32
   numChunks: 20
   numPointsPerAxis: 35
   boundsSize: 1000
@@ -1215,7 +1216,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1733419026}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -1374,7 +1375,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   atmosphereEnabled: 1
   cloudsEnabled: 1
-  underwaterEnabled: 0
+  underwaterEnabled: 1
   antiAliasingEnabled: 1
   atmosphereSettings: {fileID: 11400000, guid: 37bef69d518b7b4458fd4c0390e3f9a1, type: 2}
   depthShader: {fileID: 4800000, guid: 4cf13758782c8b14f886c593390d8807, type: 3}
