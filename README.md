@@ -1,7 +1,4 @@
-# Terraforming
+# Marching Cubes Planets
 
-[Watch video](https://youtu.be/vTMEdHcKgM4)
+![Terraforming](https://cdn.discordapp.com/attachments/1290804020272828480/1306384365592379524/GEORGEWASHINGTONGAMER.png?ex=673678c0&is=67352740&hm=65be9465f22f301800f5c7e910a9a8968f8f5650998e41c37e70940c0035df6d&)
 
-![Terraforming](https://raw.githubusercontent.com/SebLague/Images/master/Terraforming.png)
-![TerraformingFiles](https://github.com/SebLague/Images/blob/master/TerraformingFiles.png?raw=true)
-Created with Unity 2020.3
