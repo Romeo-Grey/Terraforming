@@ -329,11 +329,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c97c9cb73740fe64d91491c03c60b152, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  loadDistance: 32
+  loadDistance: 100
   numChunks: 20
   numPointsPerAxis: 35
   boundsSize: 1000
-  isoLevel: 0
+  isoLevel: 1
   useFlatShading: 0
   noiseScale: 0.001
   noiseHeightMultiplier: 0.05

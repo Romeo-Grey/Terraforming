@@ -73,6 +73,7 @@ public class GenTest : MonoBehaviour
 		
 		chunkLoader = gameObject.AddComponent<ChunkLoader>();
 		chunkLoader.genTest = this;
+	
 		
 		if (player == null)
 		{
@@ -80,6 +81,7 @@ public class GenTest : MonoBehaviour
 		}
 		
 		ComputeDensity();
+		ProcessDensityMap();
 		
 		ComputeHelper.CreateRenderTexture3D(ref originalMap, processedDensityTexture);
 		ComputeHelper.CopyRenderTexture3D(processedDensityTexture, originalMap);
@@ -159,15 +161,11 @@ public class GenTest : MonoBehaviour
 			ComputeHelper.Dispatch(blurCompute, size, size, size);
 		}
 	}
-
 	public void GenerateChunk(Chunk chunk)
 	{
-
-
 		// Marching cubes
 		int numVoxelsPerAxis = numPointsPerAxis - 1;
 		int marchKernel = 0;
-
 
 		meshCompute.SetInt("textureSize", processedDensityTexture.width);
 		meshCompute.SetInt("numPointsPerAxis", numPointsPerAxis);
@@ -178,7 +176,6 @@ public class GenTest : MonoBehaviour
 
 		Vector3 chunkCoord = (Vector3)chunk.id * (numPointsPerAxis - 1);
 		meshCompute.SetVector("chunkCoord", chunkCoord);
-
 		ComputeHelper.Dispatch(meshCompute, numVoxelsPerAxis, numVoxelsPerAxis, numVoxelsPerAxis, marchKernel);
 
 		// Create mesh
@@ -186,23 +183,14 @@ public class GenTest : MonoBehaviour
 		triCountBuffer.SetData(vertexCountData);
 		ComputeBuffer.CopyCount(triangleBuffer, triCountBuffer, 0);
 
-		//timer_fetchVertexData.Start();
 		triCountBuffer.GetData(vertexCountData);
-
 		int numVertices = vertexCountData[0] * 3;
 
 		// Fetch vertex data from GPU
-
 		triangleBuffer.GetData(vertexDataArray, 0, 0, numVertices);
 
-		//timer_fetchVertexData.Stop();
-
-		//CreateMesh(vertices);
-		timer_processVertexData.Start();
 		chunk.CreateMesh(vertexDataArray, numVertices, useFlatShading);
-		timer_processVertexData.Stop();
 	}
-
 	void Update()
 	{
 		material.SetTexture("DensityTex", originalMap);
